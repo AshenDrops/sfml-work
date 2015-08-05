@@ -21,18 +21,31 @@ sf::Vector2f gridToCoord(sf::Vector2i gridCoords);
 sf::Sprite xys[9];
 bool drawXys[9];
 
+bool showWinner;
+
+int waitSeconds;
+bool resetClock;
+
 sf::Texture xImg;
 
 sf::Texture oImg;
 
+sf::Text text;
+
 class GameState{
   public:
     GameState(){
+      setUp();
+    }
+    void setUp(){
       // Populate board
       for(int i=0;i<gridHeight;i++){
         for(int j=0;j<gridWidth;j++){
           this->board[i][j] = ' ';
         }
+      }
+      for(int i=0;i<9;i++){
+        drawXys[i] = false;
       }
       for(int i=0;i<8;i++){
         xTracker[i]=0;
@@ -40,27 +53,44 @@ class GameState{
       }
       this->turn = 'x';
       this->turnNum = 0;
+      this->winner = ' ';
     }
 
     void choose(int x, int y){
       if(this->board[y][x] == ' '){
         this->board[y][x] = this->turn;
         this->draw(x, y);
-        this->checkForWin();
-        this->turnNum++;
-        if(this->turn == 'x'){this->turn='y';}else{this->turn='x';}
-        if(this->turnNum == 9){
-          //this->endGame();
+        bool hasWon = this->checkForWin();
+        if(this->turn == 'x'){this->turn='o';}else{this->turn='x';}
+        if(this->turnNum == 8||hasWon){
+          this->turnNum = 0;
+          this->endGame();
+          this->setUp();
           std::cout << "It's over dog" << std::endl;
+        }else{
+          this->turnNum++;
         }
       }else{
         std::cout << "That tile has already been played in." << std::endl;
       }
     }
 
+    void endGame(){
+      waitSeconds = 10;
+      resetClock = true;
+      if(this->winner == 'o'){
+        text.setString("O is the Winner");
+      }else if(this->winner == 'x'){
+        text.setString("X is the Winner");
+      }else{
+        text.setString("No winner");
+      }
+      text.setPosition((winWidth/2)-(text.getLocalBounds().width/2), 10);
+    }
+
     void draw(int x, int y){
       int* tracker;
-      if(this->turn == 'y'){
+      if(this->turn == 'o'){
         tracker = oTracker;
       }else{
         tracker = xTracker;
@@ -69,23 +99,42 @@ class GameState{
       tracker[3+y]++;
       if(x==y) tracker[6]++;
       if(x+y==2) tracker[7]++;
+      std::cout << "Uh:" << this->turnNum << std::endl;
       xys[this->turnNum].setPosition(gridToCoord(sf::Vector2i(x,y)));
       drawXys[this->turnNum] = true;
     }
 
-    void checkForWin(){
+    bool checkForWin(){
+      /* this->printWinCheck(); */
       if(this->turn == 'x'){
         for(int i=0;i<8;i++){
           if(xTracker[i] == 3){
             std::cout<<"You win dog (X)"<<std::endl;
+            this->winner = 'x';
+            return true;
           }
         }
       }else{
         for(int i=0;i<8;i++){
           if(oTracker[i] == 3){
             std::cout<<"You win dog (O)"<<std::endl;
+            this->winner = 'o';
+            return true;
           }
         }
+      }
+      return false;
+    }
+
+    void printWinCheck(){
+      std::cout << "xTracker:" << std::endl;
+      for(int i=0;i<8;i++){
+        std::cout << xTracker[i] << std::endl;
+      }
+
+      std::cout << "oTracker:" << std::endl;
+      for(int i=0;i<8;i++){
+        std::cout << oTracker[i] << std::endl;
       }
     }
 
@@ -95,6 +144,7 @@ class GameState{
     int turnNum;
     int xTracker[8];
     int oTracker[8];
+    char winner;
 };
 
 int main(){
@@ -104,8 +154,21 @@ int main(){
   // VSync
   window.setVerticalSyncEnabled(true);
 
+  sf::Clock clock;
+
+  waitSeconds = 0;
+  resetClock = false;
+
   GameState game;
   bool mouseUp = true;
+
+  sf::Font font;
+  if(!font.loadFromMemory(quicksand_bold_otf, quicksand_bold_otf_len)){
+    std::cout << "Font failed to load" << std::endl;
+  }
+  text.setFont(font);
+  text.setCharacterSize(48);
+  text.setColor(sf::Color::Black);
 
   sf::Texture bg;
   if(!bg.loadFromMemory(background_png, background_png_len)){
@@ -165,6 +228,19 @@ int main(){
     for(int i=0;i<9;i++){
       if(drawXys[i]) window.draw(xys[i]);
     }
+
+    if(resetClock){
+      clock.restart();
+      resetClock = false;
+    }
+
+    if(waitSeconds != 0){
+      window.draw(text);
+      if(clock.getElapsedTime().asSeconds() >= waitSeconds){
+        waitSeconds = 0;
+      }
+    }
+
 
     window.display();
 

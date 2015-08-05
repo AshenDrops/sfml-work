@@ -2,7 +2,7 @@ NAME = test.out
 
 OBJS = main.o
 
-DATAFILES = background.png o.png x.png
+DATAFILES = background.png o.png x.png quicksand-bold.otf
 
 LIBS = -lsfml-graphics -lsfml-system -lsfml-window
 DEBUG = -g
