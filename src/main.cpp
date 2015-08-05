@@ -25,6 +25,8 @@ sf::Texture xImg;
 
 sf::Texture oImg;
 
+/* int winSits[8][6]; */
+
 class GameState{
   public:
     GameState(){
@@ -42,6 +44,7 @@ class GameState{
       if(this->board[y][x] == ' '){
         this->board[y][x] = this->turn;
         this->draw(x, y);
+        this->checkForWin();
         this->turnNum++;
         if(this->turn == 'x'){this->turn='y';}else{this->turn='x';}
         if(this->turnNum == 9){
@@ -56,6 +59,10 @@ class GameState{
     void draw(int x, int y){
       xys[this->turnNum].setPosition(gridToCoord(sf::Vector2i(x,y)));
       drawXys[this->turnNum] = true;
+    }
+
+    void checkForWin(){
+      // TODO: Do this when it's not 4:00 AM because fuarrrk this I can hardly even work Vim right now
     }
 
   private:
@@ -96,6 +103,17 @@ int main(){
       xys[i].setTexture(oImg);
     }
   }
+
+  /* int winSits[8][6] = { */
+  /*   {0,0,0,1,0,2}, */
+  /*   {1,0,1,1,1,2}, */
+  /*   {2,0,2,1,2,2}, */
+  /*   {0,0,1,0,2,0}, */
+  /*   {0,1,1,1,2,1}, */
+  /*   {0,2,1,2,2,2}, */
+  /*   {0,0,1,1,2,2}, */
+  /*   {2,0,1,1,0,2} */
+  /* }; */
 
   // Main loop
   while(window.isOpen()){
