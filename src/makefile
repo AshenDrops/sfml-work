@@ -1,6 +1,6 @@
-OBJS = main.o
+NAME = test
 
-VPATH = ./src
+OBJS = main.o
 
 LIBS = -lsfml-graphics -lsfml-system -lsfml-window
 DEBUG = -g
@@ -11,7 +11,7 @@ CXX := g++
 
 #----------
 
-test: $(OBJS)
+$(NAME): $(OBJS)
 	$(CXX) $(LFLAGS) -o $@ $(OBJS)
 
 main.o: main.cpp main.h
@@ -20,10 +20,10 @@ main.o: main.cpp main.h
 #----------
 
 clean:
-	\rm *.o test
+	\rm *.o $(NAME)
 
 install:
-	cp test /usr/bin/test
+	cp $(NAME) /usr/bin/$(NAME)
 
 uninstall:
-	rm -f /usr/bin/test
+	rm -f /usr/bin/$(NAME)
