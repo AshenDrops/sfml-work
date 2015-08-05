@@ -29,3 +29,8 @@
 
 # Vim
 *.swp
+
+# Image Files
+*.png
+
+# The executable
