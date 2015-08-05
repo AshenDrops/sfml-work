@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#include "titlemenu.h"
+#include "data.h"
 
 #define winWidth 600
 #define winHeight 600
@@ -16,6 +16,14 @@
 #define gridHeight 3
 
 sf::Vector2i coordToGrid(sf::Vector2i coords);
+sf::Vector2f gridToCoord(sf::Vector2i gridCoords);
+
+sf::Sprite xys[9];
+bool drawXys[9];
+
+sf::Texture xImg;
+
+sf::Texture oImg;
 
 class GameState{
   public:
@@ -33,6 +41,7 @@ class GameState{
     void choose(int x, int y){
       if(this->board[y][x] == ' '){
         this->board[y][x] = this->turn;
+        this->draw(x, y);
         this->turnNum++;
         if(this->turn == 'x'){this->turn='y';}else{this->turn='x';}
         if(this->turnNum == 9){
@@ -42,18 +51,11 @@ class GameState{
       }else{
         std::cout << "That tile has already been played in." << std::endl;
       }
-
-      // Only necessary until I implement graphics
-      this->draw();
     }
 
-    void draw(){
-      for(int i=0;i<gridHeight;i++){
-        for(int j=0;j<gridWidth;j++){
-          std::cout << this->board[i][j];
-        }
-        std::cout << std::endl;
-      }
+    void draw(int x, int y){
+      xys[this->turnNum].setPosition(gridToCoord(sf::Vector2i(x,y)));
+      drawXys[this->turnNum] = true;
     }
 
   private:
@@ -64,7 +66,7 @@ class GameState{
 
 int main(){
   // Create window -- 200x200 for each "tile"
-  sf::Window window(sf::VideoMode(winWidth, winHeight), "Tic-tac-toe", sf::Style::Close);
+  sf::RenderWindow window(sf::VideoMode(winWidth, winHeight), "Tic-tac-toe", sf::Style::Close);
 
   // VSync
   window.setVerticalSyncEnabled(true);
@@ -72,9 +74,27 @@ int main(){
   GameState game;
   bool mouseUp = true;
 
-  sf::Texture logo;
-  if(!logo.loadFromMemory(titlemenu_png, titlemenu_png_len, sf::IntRect(0, 272, 479, 100))){
+  sf::Texture bg;
+  if(!bg.loadFromMemory(background_png, background_png_len)){
     std::cout << "Error with loading titlemenu.png from memory" << std::endl;
+  }
+  sf::Sprite bgSprite;
+  bgSprite.setTexture(bg);
+
+  if(!oImg.loadFromMemory(o_png, o_png_len)){
+    std::cout << "Error with loading o.png from memory" << std::endl;
+  }
+  if(!xImg.loadFromMemory(x_png, x_png_len)){
+    std::cout << "Error with loading x.png from memory" << std::endl;
+  }
+
+  for(int i=0;i<9;i++){
+    drawXys[i] = false;
+    if(i%2 == 0){
+      xys[i].setTexture(xImg);
+    }else{
+      xys[i].setTexture(oImg);
+    }
   }
 
   // Main loop
@@ -97,14 +117,24 @@ int main(){
     bool pressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
     if(mouseUp && pressed){
       sf::Vector2i rawPosition = sf::Mouse::getPosition(window);
-      sf::Vector2i position = coordToGrid(rawPosition);
-      std::cout << "x:" << rawPosition.x << " y:" << rawPosition.y << std::endl;
-      std::cout << "x:" << position.x << " y:" << position.y << std::endl;
-      game.choose(position.x, position.y);
+      if(rawPosition.x > fieldXOffset && rawPosition.x < fieldWidth + fieldXOffset && rawPosition.y > fieldYOffset && rawPosition.y < fieldWidth + fieldXOffset){
+        sf::Vector2i position = coordToGrid(rawPosition);
+        game.choose(position.x, position.y);
+      }
       mouseUp = false;
     }else if(!mouseUp && !pressed){
       mouseUp = true;
     }
+
+    window.clear(sf::Color::Black);
+
+    window.draw(bgSprite);
+    for(int i=0;i<9;i++){
+      if(drawXys[i]) window.draw(xys[i]);
+    }
+
+    window.display();
+
 
   }
 
@@ -114,6 +144,15 @@ int main(){
 sf::Vector2i coordToGrid(sf::Vector2i coords){
   int widthFactor = fieldWidth/gridWidth;
   int heightFactor = fieldHeight/gridHeight;
-  sf::Vector2i gridCoords(((coords.x-(coords.x%widthFactor))/widthFactor), ((coords.y-(coords.y%heightFactor))/heightFactor));
+  int x = coords.x - fieldXOffset;
+  int y = coords.y - fieldYOffset;
+  sf::Vector2i gridCoords(((x-(x%widthFactor))/widthFactor), ((y-(y%heightFactor))/heightFactor));
   return(gridCoords);
+}
+
+sf::Vector2f gridToCoord(sf::Vector2i gridCoords){
+  int widthFactor = fieldWidth/gridWidth;
+  int heightFactor = fieldHeight/gridHeight;
+  sf::Vector2f coords(fieldXOffset+(gridCoords.x*widthFactor),fieldYOffset+(gridCoords.y*heightFactor));
+  return(coords);
 }

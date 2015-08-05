@@ -1,6 +1,8 @@
 NAME = test.out
 
-OBJS = main.o binary.o
+OBJS = main.o
+
+DATAFILES = background.png o.png x.png
 
 LIBS = -lsfml-graphics -lsfml-system -lsfml-window
 DEBUG = -g
@@ -14,11 +16,12 @@ CXX := g++
 $(NAME): $(OBJS)
 	$(CXX) $(LFLAGS) -o $@ $(OBJS)
 
-main.o: main.cpp main.h titlemenu.h
+main.o: main.cpp main.h data.h
 	$(CXX) $(CFLAGS) -o $@ main.cpp
 
-titlemenu.h: titlemenu.png
-	xxd -i $< > $@
+data.h: $(DATAFILES)
+	echo -n "" > $@
+	for file in $(DATAFILES); do xxd -i $$file >> $@; done
 
 #----------
 
