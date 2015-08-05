@@ -1,6 +1,6 @@
-NAME = test
+NAME = test.out
 
-OBJS = main.o
+OBJS = main.o binary.o
 
 LIBS = -lsfml-graphics -lsfml-system -lsfml-window
 DEBUG = -g
@@ -14,8 +14,11 @@ CXX := g++
 $(NAME): $(OBJS)
 	$(CXX) $(LFLAGS) -o $@ $(OBJS)
 
-main.o: main.cpp main.h
+main.o: main.cpp main.h titlemenu.h
 	$(CXX) $(CFLAGS) -o $@ main.cpp
+
+titlemenu.h: titlemenu.png
+	xxd -i $< > $@
 
 #----------
 
