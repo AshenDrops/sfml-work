@@ -25,8 +25,6 @@ sf::Texture xImg;
 
 sf::Texture oImg;
 
-/* int winSits[8][6]; */
-
 class GameState{
   public:
     GameState(){
@@ -35,6 +33,10 @@ class GameState{
         for(int j=0;j<gridWidth;j++){
           this->board[i][j] = ' ';
         }
+      }
+      for(int i=0;i<8;i++){
+        xTracker[i]=0;
+        oTracker[i]=0;
       }
       this->turn = 'x';
       this->turnNum = 0;
@@ -57,18 +59,42 @@ class GameState{
     }
 
     void draw(int x, int y){
+      int* tracker;
+      if(this->turn == 'y'){
+        tracker = oTracker;
+      }else{
+        tracker = xTracker;
+      }
+      tracker[x]++;
+      tracker[3+y]++;
+      if(x==y) tracker[6]++;
+      if(x+y==2) tracker[7]++;
       xys[this->turnNum].setPosition(gridToCoord(sf::Vector2i(x,y)));
       drawXys[this->turnNum] = true;
     }
 
     void checkForWin(){
-      // TODO: Do this when it's not 4:00 AM because fuarrrk this I can hardly even work Vim right now
+      if(this->turn == 'x'){
+        for(int i=0;i<8;i++){
+          if(xTracker[i] == 3){
+            std::cout<<"You win dog (X)"<<std::endl;
+          }
+        }
+      }else{
+        for(int i=0;i<8;i++){
+          if(oTracker[i] == 3){
+            std::cout<<"You win dog (O)"<<std::endl;
+          }
+        }
+      }
     }
 
   private:
     char board[gridHeight][gridWidth];
     char turn;
     int turnNum;
+    int xTracker[8];
+    int oTracker[8];
 };
 
 int main(){
@@ -103,17 +129,6 @@ int main(){
       xys[i].setTexture(oImg);
     }
   }
-
-  /* int winSits[8][6] = { */
-  /*   {0,0,0,1,0,2}, */
-  /*   {1,0,1,1,1,2}, */
-  /*   {2,0,2,1,2,2}, */
-  /*   {0,0,1,0,2,0}, */
-  /*   {0,1,1,1,2,1}, */
-  /*   {0,2,1,2,2,2}, */
-  /*   {0,0,1,1,2,2}, */
-  /*   {2,0,1,1,0,2} */
-  /* }; */
 
   // Main loop
   while(window.isOpen()){
