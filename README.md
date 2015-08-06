@@ -1,1 +1,3 @@
-terrible code but it works?
+#Tic-Tac-Toe in SFML
+
+Horribly coded but working.
