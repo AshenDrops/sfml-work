@@ -1,2 +1,1 @@
-# sfml-work
-Basically where I screw around with SFML and C++
+terrible code but it works?
