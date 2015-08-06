@@ -16,7 +16,7 @@ CXX := g++
 $(NAME): $(OBJS)
 	$(CXX) $(LFLAGS) -o $@ $(OBJS)
 
-main.o: main.cpp main.h data.h
+main.o: main.cpp data.h
 	$(CXX) $(CFLAGS) -o $@ main.cpp
 
 data.h: $(DATAFILES)
