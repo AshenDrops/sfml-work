@@ -126,18 +126,6 @@ class GameState{
       return false;
     }
 
-    void printWinCheck(){
-      std::cout << "xTracker:" << std::endl;
-      for(int i=0;i<8;i++){
-        std::cout << xTracker[i] << std::endl;
-      }
-
-      std::cout << "oTracker:" << std::endl;
-      for(int i=0;i<8;i++){
-        std::cout << oTracker[i] << std::endl;
-      }
-    }
-
   private:
     char board[gridHeight][gridWidth];
     char turn;

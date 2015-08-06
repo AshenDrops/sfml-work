@@ -26,7 +26,7 @@ data.h: $(DATAFILES)
 #----------
 
 clean:
-	\rm *.o $(NAME)
+	\rm *.o $(NAME) data.h
 
 install:
 	cp $(NAME) /usr/bin/$(NAME)
